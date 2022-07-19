@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inobitec.orderxml.mapper.OrderMapper">
+
+    <resultMap id="orderMap" type="com.inobitec.orderxml.model.Order">
+        <result property="orderStatusId" column="order_status_id"/>
+        <result property="customerName" column="customer_name"/>
+        <result property="customerPhone" column="customer_phone"/>
+        <result property="customerComment" column="customer_phone"/>
+<!--         <result property="orderItemList" column="ORDER_ITEM_LIST"/>-->
+    </resultMap>
+
+    <select id="findOrderById" parameterType="Integer" resultMap="orderMap">
+        SELECT ID, ORDER_STATUS_ID, CUSTOMER_NAME, CUSTOMER_PHONE, CUSTOMER_COMMENT
+        FROM "order"
+        WHERE "order".ID = #{id}
+    </select>
+
+</mapper>

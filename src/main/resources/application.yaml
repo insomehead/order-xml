@@ -1,0 +1,7 @@
+spring.datasource:
+  driverClassName: org.postgresql.Driver
+  url: jdbc:postgresql://localhost:5432/inobitec
+  username: insomehead
+  password: 3669
+mybatis:
+  mapper-locations: classpath*:static/mapper/*.xml
