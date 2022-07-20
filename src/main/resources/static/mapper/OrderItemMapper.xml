@@ -10,8 +10,10 @@
         <result property="itemName" column="item_name"/>
     </resultMap>
 
-    <delete id = "deleteOrderItemById" parameterType = "Integer">
-        DELETE from order_item WHERE ORDER_ID = #{id};
+    <delete id="deleteOrderItemByOrderId" parameterType="Integer">
+        DELETE
+        FROM order_item
+        WHERE ORDER_ID = #{id};
     </delete>
 
     <insert id="saveOrderItem" keyColumn="id" keyProperty="id" parameterType="com.inobitec.orderxml.model.OrderItem">
@@ -22,9 +24,15 @@
         VALUES (#{orderItem.id}, #{orderItem.orderId}, #{orderItem.itemName})
     </insert>
 
-    <update id = "updateOrderItem" parameterType = "com.inobitec.orderxml.model.OrderItem">
-        UPDATE order_item SET item_name= #{orderItem.itemName}
-        WHERE id = #{id};
+    <update id="updateOrderItem" parameterType="com.inobitec.orderxml.model.OrderItem">
+        UPDATE order_item
+        SET item_name = #{itemName}
+        WHERE id = #{id}
+          AND order_id = #{order_id}
     </update>
+
+    <delete id="deleteOrderItemById" parameterType="Integer">
+        DELETE FROM order_item WHERE id = #{id}
+    </delete>
 
 </mapper>

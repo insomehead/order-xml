@@ -13,5 +13,5 @@ public interface OrderMapper {
 
     void saveOrder(Order order);
 
-    void updateOrder(@Param("id") Integer id);
+    void updateOrder(@Param("order") Order order, @Param("id") Integer id);
 }

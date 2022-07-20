@@ -10,20 +10,27 @@
         <result property="customerName" column="customer_name"/>
         <result property="customerPhone" column="customer_phone"/>
         <result property="customerComment" column="customer_comment"/>
-        <collection property="orderItemList" resultMap="com.inobitec.orderxml.mapper.OrderItemMapper.orderItemMap" />
+        <collection property="orderItemList" resultMap="com.inobitec.orderxml.mapper.OrderItemMapper.orderItemMap"/>
     </resultMap>
 
     <select id="findOrderById" parameterType="Integer" resultMap="orderMap">
-        SELECT "order".ID, "order".ORDER_STATUS_ID,
-               "order".CUSTOMER_NAME, "order".CUSTOMER_PHONE,
+        SELECT "order".ID,
+               "order".ORDER_STATUS_ID,
+               "order".CUSTOMER_NAME,
+               "order".CUSTOMER_PHONE,
                "order".CUSTOMER_COMMENT,
-               order_item.ID AS order_item_id, order_item.ORDER_ID, order_item.ITEM_NAME
-        FROM "order" LEFT JOIN order_item  on "order".ID = order_item.ORDER_ID
+               order_item.ID AS order_item_id,
+               order_item.ORDER_ID,
+               order_item.ITEM_NAME
+        FROM "order"
+                 LEFT JOIN order_item on "order".ID = order_item.ORDER_ID
         WHERE "order".ID = #{id}
     </select>
 
-    <delete id = "deleteOrderById" parameterType = "Integer">
-        DELETE from "order" WHERE ID = #{id};
+    <delete id="deleteOrderById" parameterType="Integer">
+        DELETE
+        from "order"
+        WHERE ID = #{id};
     </delete>
 
     <insert id="saveOrder" keyColumn="id" keyProperty="id" parameterType="com.inobitec.orderxml.model.Order">
@@ -33,6 +40,15 @@
         INSERT INTO "order" (id, order_status_id, customer_name, customer_phone, customer_comment)
         VALUES (#{id}, #{orderStatusId}, #{customerName}, #{customerPhone}, #{customerComment})
     </insert>
+
+    <update id="updateOrder" parameterType="com.inobitec.orderxml.model.Order">
+        UPDATE "order"
+        SET order_status_id= #{order.orderStatusId},
+            customer_name= #{order.customerName},
+            customer_phone = #{order.customerPhone},
+            customer_comment = #{order.customerComment}
+        WHERE id = #{id};
+    </update>
 
 
 
