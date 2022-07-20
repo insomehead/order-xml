@@ -9,7 +9,7 @@
         <result property="orderStatusId" column="order_status_id"/>
         <result property="customerName" column="customer_name"/>
         <result property="customerPhone" column="customer_phone"/>
-        <result property="customerComment" column="customer_phone"/>
+        <result property="customerComment" column="customer_comment"/>
         <collection property="orderItemList" resultMap="com.inobitec.orderxml.mapper.OrderItemMapper.orderItemMap" />
     </resultMap>
 
@@ -21,5 +21,19 @@
         FROM "order" LEFT JOIN order_item  on "order".ID = order_item.ORDER_ID
         WHERE "order".ID = #{id}
     </select>
+
+    <delete id = "deleteOrderById" parameterType = "Integer">
+        DELETE from "order" WHERE ID = #{id};
+    </delete>
+
+    <insert id="saveOrder" keyColumn="id" keyProperty="id" parameterType="com.inobitec.orderxml.model.Order">
+        <selectKey keyProperty="id" resultType="int" order="BEFORE">
+            SELECT NEXTVAL('ORDER_SEQ')
+        </selectKey>
+        INSERT INTO "order" (id, order_status_id, customer_name, customer_phone, customer_comment)
+        VALUES (#{id}, #{orderStatusId}, #{customerName}, #{customerPhone}, #{customerComment})
+    </insert>
+
+
 
 </mapper>

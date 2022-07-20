@@ -9,4 +9,22 @@
         <result property="orderId" column="order_id"/>
         <result property="itemName" column="item_name"/>
     </resultMap>
+
+    <delete id = "deleteOrderItemById" parameterType = "Integer">
+        DELETE from order_item WHERE ORDER_ID = #{id};
+    </delete>
+
+    <insert id="saveOrderItem" keyColumn="id" keyProperty="id" parameterType="com.inobitec.orderxml.model.OrderItem">
+        <selectKey keyProperty="orderItem.id" resultType="int" order="BEFORE">
+            SELECT NEXTVAL('ORDER_ITEM_SEQ')
+        </selectKey>
+        INSERT INTO order_item (id, order_id, item_name)
+        VALUES (#{orderItem.id}, #{orderItem.orderId}, #{orderItem.itemName})
+    </insert>
+
+    <update id = "updateOrderItem" parameterType = "com.inobitec.orderxml.model.OrderItem">
+        UPDATE order_item SET item_name= #{orderItem.itemName}
+        WHERE id = #{id};
+    </update>
+
 </mapper>

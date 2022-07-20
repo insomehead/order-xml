@@ -8,4 +8,10 @@ import org.apache.ibatis.annotations.Param;
 public interface OrderMapper {
 
     Order findOrderById(@Param("id") Integer id);
+
+    void deleteOrderById(@Param("id") Integer id);
+
+    void saveOrder(Order order);
+
+    void updateOrder(@Param("id") Integer id);
 }
