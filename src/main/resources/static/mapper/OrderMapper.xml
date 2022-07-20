@@ -5,16 +5,20 @@
 <mapper namespace="com.inobitec.orderxml.mapper.OrderMapper">
 
     <resultMap id="orderMap" type="com.inobitec.orderxml.model.Order">
+        <id property="id" column="id"/>
         <result property="orderStatusId" column="order_status_id"/>
         <result property="customerName" column="customer_name"/>
         <result property="customerPhone" column="customer_phone"/>
         <result property="customerComment" column="customer_phone"/>
-<!--         <result property="orderItemList" column="ORDER_ITEM_LIST"/>-->
+        <collection property="orderItemList" resultMap="com.inobitec.orderxml.mapper.OrderItemMapper.orderItemMap" />
     </resultMap>
 
     <select id="findOrderById" parameterType="Integer" resultMap="orderMap">
-        SELECT ID, ORDER_STATUS_ID, CUSTOMER_NAME, CUSTOMER_PHONE, CUSTOMER_COMMENT
-        FROM "order"
+        SELECT "order".ID, "order".ORDER_STATUS_ID,
+               "order".CUSTOMER_NAME, "order".CUSTOMER_PHONE,
+               "order".CUSTOMER_COMMENT,
+               order_item.ID AS order_item_id, order_item.ORDER_ID, order_item.ITEM_NAME
+        FROM "order" LEFT JOIN order_item  on "order".ID = order_item.ORDER_ID
         WHERE "order".ID = #{id}
     </select>
 
