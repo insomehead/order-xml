@@ -44,6 +44,7 @@ public class OrderServiceImpl implements OrderService {
     public void updateOrder(Integer id, Order order) {
         List<OrderItem> oldOrderItemList = orderMapper.findOrderById(id).getOrderItemList();
         List<OrderItem> orderItemList = order.getOrderItemList();
+
         orderMapper.updateOrder(order, id);
         if (orderItemList == null || orderItemList.isEmpty()) {
             orderItemMapper.deleteOrderItemByOrderId(id);

@@ -32,7 +32,9 @@
     </update>
 
     <delete id="deleteOrderItemById" parameterType="Integer">
-        DELETE FROM order_item WHERE id = #{id}
+        DELETE
+        FROM order_item
+        WHERE id = #{id}
     </delete>
 
 </mapper>
