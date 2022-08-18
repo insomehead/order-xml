@@ -3,5 +3,10 @@ spring.datasource:
   url: jdbc:postgresql://localhost:5432/inobitec
   username: headly
   password: 3669
+
 mybatis:
   mapper-locations: classpath*:static/mapper/*.xml
+spring:
+  flyway:
+    enabled: true
+    locations: db/migration

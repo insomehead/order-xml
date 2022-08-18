@@ -24,7 +24,7 @@ public class OrderController {
 
     @PostMapping("")
     public Order saveOrder(@RequestBody Order order) {
-        orderServiceImpl.saveOrder(order);
+        orderServiceImpl.addOrder(order);
         return orderServiceImpl.getOrderById(order.getId());
     }
 

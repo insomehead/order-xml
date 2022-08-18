@@ -11,7 +11,7 @@ public interface OrderMapper {
 
     void deleteOrderById(@Param("id") Integer id);
 
-    void saveOrder(Order order);
+    void addOrder(Order order);
 
     void updateOrder(@Param("order") Order order, @Param("id") Integer id);
 }

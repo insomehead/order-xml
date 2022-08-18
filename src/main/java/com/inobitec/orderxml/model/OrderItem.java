@@ -1,17 +1,13 @@
 package com.inobitec.orderxml.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText;
 import lombok.*;
 
-@Data
-@JacksonXmlRootElement(localName = "items")
-public class OrderItem {
 
-    public OrderItem(String itemName) {
-        this.itemName = itemName;
-    }
+@Data
+public class OrderItem {
 
     @JsonIgnore
     private Integer id;
@@ -19,6 +15,6 @@ public class OrderItem {
     @JsonIgnore
     private Integer orderId;
 
-    @JacksonXmlProperty(localName = "item")
+    @JacksonXmlText
     private String itemName;
 }

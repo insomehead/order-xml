@@ -33,7 +33,7 @@
         WHERE ID = #{id};
     </delete>
 
-    <insert id="saveOrder" keyColumn="id" keyProperty="id" parameterType="com.inobitec.orderxml.model.Order">
+    <insert id="addOrder" keyColumn="id" keyProperty="id" parameterType="com.inobitec.orderxml.model.Order">
         <selectKey keyProperty="id" resultType="int" order="BEFORE">
             SELECT NEXTVAL('ORDER_SEQ')
         </selectKey>
