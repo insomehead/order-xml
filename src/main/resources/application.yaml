@@ -10,3 +10,7 @@ spring:
   flyway:
     enabled: true
     locations: db/migration
+
+value:
+  timeout:
+    minutes: 60

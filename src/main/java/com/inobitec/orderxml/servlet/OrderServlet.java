@@ -16,7 +16,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 
 
-@WebServlet("/order-servlet")
+@WebServlet(name = "OrderServlet", urlPatterns = "/order-servlet")
 @RequiredArgsConstructor
 public class OrderServlet extends HttpServlet {
 
@@ -26,66 +26,76 @@ public class OrderServlet extends HttpServlet {
 
     private static final XmlMapper xmlMapper = new XmlMapper();
 
-    private static final String XML_TEXT_TYPE = "text/xml";
-
+    private static final String TEXT_XML_TYPE = "text/xml";
     private static final String UTF_8 = "UTF-8";
 
-    private static final String ID_XML_PROPERTY = "id";
+    private static final String ID_PROPERTY = "id";
+
+    private static final String CREATE_COMMAND = "create";
+    private static final String READ_COMMAND = "read";
+    private static final String DELETE_COMMAND = "delete";
+    private static final String UPDATE_COMMAND = "update";
 
     @Override
     @Transactional
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType(XML_TEXT_TYPE);
+
+        response.setContentType(TEXT_XML_TYPE);
         response.setCharacterEncoding(UTF_8);
         InputStream in = request.getInputStream();
         PrintWriter out = response.getWriter();
         Message message = xmlMapper.readValue(in, Message.class);
         Order orderFromRequest = message.getBody().getOrder();
-        if ("create".equals(message.getCommand())) {
-            orderServiceImpl.addOrder(orderFromRequest);
-            response.setStatus(HttpServletResponse.SC_CREATED);
-        }
+        Order order;
+        int id;
 
-        if ("read".equals(message.getCommand())) {
-            Integer id = Integer.valueOf(request.getParameter(ID_XML_PROPERTY));
-            Order order = orderServiceImpl.getOrderById(id);
-            if (order == null) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                out.print(response.getStatus());
-                return;
-            }
-            String xmlOrder = xmlMapper.writeValueAsString(order);
-            out.print(xmlOrder);
-            response.setStatus(HttpServletResponse.SC_OK);
-            return;
-        }
+        switch (message.getCommand()) {
 
-        if ("delete".equals(message.getCommand())) {
-            Integer id = Integer.valueOf(request.getParameter(ID_XML_PROPERTY));
-            Order order = orderServiceImpl.getOrderById(id);
-            if (order == null) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                out.print(response.getStatus());
-                return;
-            }
-            orderServiceImpl.deleteOrderById(id);
-            response.setStatus(HttpServletResponse.SC_OK);
-            return;
-        }
+            case CREATE_COMMAND:
+                orderServiceImpl.addOrder(orderFromRequest);
+                response.setStatus(HttpServletResponse.SC_CREATED);
+                break;
 
-        if ("update".equals(message.getCommand())) {
-            Integer id = Integer.valueOf(request.getParameter(ID_XML_PROPERTY));
-            Order order = orderServiceImpl.getOrderById(id);
-            if (order == null) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            case READ_COMMAND:
+                id = Integer.parseInt(request.getParameter(ID_PROPERTY));
+                order = orderServiceImpl.getOrderById(id);
+                if (order == null) {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    out.print(response.getStatus());
+                    return;
+                }
+                String xmlOrder = xmlMapper.writeValueAsString(order);
+                out.print(xmlOrder);
+                response.setStatus(HttpServletResponse.SC_OK);
+                break;
+
+            case DELETE_COMMAND:
+                id = Integer.parseInt(request.getParameter(ID_PROPERTY));
+                order = orderServiceImpl.getOrderById(id);
+                if (order == null) {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    out.print(response.getStatus());
+                    return;
+                }
+                orderServiceImpl.deleteOrderById(id);
+                response.setStatus(HttpServletResponse.SC_OK);
+                break;
+
+            case UPDATE_COMMAND:
+                id = Integer.parseInt(request.getParameter(ID_PROPERTY));
+                order = orderServiceImpl.getOrderById(id);
+                if (order == null) {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    out.print(response.getStatus());
+                    return;
+                }
+                orderServiceImpl.updateOrder(id, orderFromRequest);
+                response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                break;
+
+            default:
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.print(response.getStatus());
-                return;
-            }
-            orderServiceImpl.updateOrder(id, orderFromRequest);
-            response.setStatus(HttpServletResponse.SC_ACCEPTED);
-        } else {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            out.print(response.getStatus());
         }
     }
 }
