@@ -19,7 +19,7 @@ public class SessionFilter implements Filter {
 
     private final SessionServiceImpl sessionService;
 
-//    @Value("${value.timeout.minutes}") чет не вышло. потом ещё попробую
+    //    @Value("${value.timeout.minutes}") чет не вышло. потом ещё попробую
     private static final Integer TIMEOUT_MINUTES = 60;
 
     private static final String SESSION_ID_PROPERTY = "sessionId";
@@ -32,17 +32,21 @@ public class SessionFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
 
+
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         String sessionId = httpServletRequest.getHeader(SESSION_ID_PROPERTY);
-        Session session = sessionService.getSessionBySessionId(sessionId);
+        Session session;
         PrintWriter out = httpServletResponse.getWriter();
 
         if (sessionId == null || sessionId.isEmpty()) {
             httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             out.print("Invalid session");
             return;
-        } else if (session == null) {
+        } else {
+            session = sessionService.getSessionBySessionId(sessionId);
+        }
+        if (session == null) {
             httpServletResponse.setStatus(HttpServletResponse.SC_NOT_FOUND);
             out.print("Unknown session");
             return;

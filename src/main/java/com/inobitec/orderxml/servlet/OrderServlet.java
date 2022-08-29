@@ -46,8 +46,8 @@ public class OrderServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         Message message = xmlMapper.readValue(in, Message.class);
         Order orderFromRequest = message.getBody().getOrder();
-        Order order;
-        int id;
+        Order order = null;
+        int id = -1;
 
         switch (message.getCommand()) {
 

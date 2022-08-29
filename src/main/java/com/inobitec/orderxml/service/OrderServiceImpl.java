@@ -36,7 +36,8 @@ public class OrderServiceImpl implements OrderService {
             return;
         }
         for (OrderItem orderItem : orderItemList) {
-            orderItem.setOrderId(order.getId());
+            Integer orderId = order.getId();
+            orderItem.setOrderId(orderId);
             orderItemMapper.addOrderItem(orderItem);
         }
     }

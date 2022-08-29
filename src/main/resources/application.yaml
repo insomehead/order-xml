@@ -1,6 +1,6 @@
 spring.datasource:
   driverClassName: org.postgresql.Driver
-  url: jdbc:postgresql://localhost:5432/inobitec
+  url: jdbc:postgresql://localhost:5432/order_microservice
   username: headly
   password: 3669
 
@@ -14,3 +14,6 @@ spring:
 value:
   timeout:
     minutes: 60
+
+server:
+  port: 8080

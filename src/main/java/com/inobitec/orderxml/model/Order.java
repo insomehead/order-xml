@@ -26,6 +26,9 @@ public class Order {
     @JacksonXmlProperty(localName = "customerComment")
     private String customerComment;
 
+    @JacksonXmlProperty(localName = "patientId")
+    private Integer patientId;
+
     @JacksonXmlElementWrapper(localName = "items")
     @JacksonXmlProperty(localName = "item")
     private List<OrderItem> orderItemList;

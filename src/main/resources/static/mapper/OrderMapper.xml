@@ -10,6 +10,7 @@
         <result property="customerName" column="customer_name"/>
         <result property="customerPhone" column="customer_phone"/>
         <result property="customerComment" column="customer_comment"/>
+        <result property="patientId" column="patient_id"/>
         <collection property="orderItemList" resultMap="com.inobitec.orderxml.mapper.OrderItemMapper.orderItemMap"/>
     </resultMap>
 
@@ -19,6 +20,7 @@
                "order".CUSTOMER_NAME,
                "order".CUSTOMER_PHONE,
                "order".CUSTOMER_COMMENT,
+               "order".patient_id,
                order_item.ID AS order_item_id,
                order_item.ORDER_ID,
                order_item.ITEM_NAME
@@ -37,8 +39,8 @@
         <selectKey keyProperty="id" resultType="int" order="BEFORE">
             SELECT NEXTVAL('ORDER_SEQ')
         </selectKey>
-        INSERT INTO "order" (id, order_status_id, customer_name, customer_phone, customer_comment)
-        VALUES (#{id}, #{orderStatusId}, #{customerName}, #{customerPhone}, #{customerComment})
+        INSERT INTO "order" (id, order_status_id, customer_name, customer_phone, customer_comment, patient_id)
+        VALUES (#{id}, #{orderStatusId}, #{customerName}, #{customerPhone}, #{customerComment}, #{patientId})
     </insert>
 
     <update id="updateOrder" parameterType="com.inobitec.orderxml.model.Order">
