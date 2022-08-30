@@ -11,6 +11,8 @@ import java.time.LocalDate;
 @JacksonXmlRootElement(localName = "patient")
 public class Patient {
 
+    private static final String SPACE = " ";
+
     private Integer id;
 
     private String firstName;
@@ -30,7 +32,7 @@ public class Patient {
     private String address;
 
     public String getFullName() {
-        return firstName + " " + midName + " " + lastName;
+        return firstName + SPACE + midName + SPACE + lastName;
     }
 
     public PatientDto mapToDto() {
@@ -48,6 +50,9 @@ public class Patient {
     }
 
     public static Patient mapToEntity(PatientDto patientDto) {
+        if (patientDto == null){
+            return null;
+        }
         Patient patient = new Patient();
         patient.setId(patientDto.getId());
         patient.setFirstName(patientDto.getFirstName());

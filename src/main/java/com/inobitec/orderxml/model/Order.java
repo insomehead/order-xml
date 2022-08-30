@@ -56,6 +56,9 @@ public class Order {
     }
 
     public static Order mapToEntity(OrderDto orderDto) {
+        if (orderDto == null){
+            return null;
+        }
         Order order = new Order();
         order.setId(orderDto.getId());
         order.setOrderStatusId(orderDto.getOrderStatusId());

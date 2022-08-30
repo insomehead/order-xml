@@ -35,6 +35,7 @@ public class PatientService {
     private static final String FIRST_NAME = "firstName";
     private static final String MID_NAME = "midName";
     private static final String LAST_NAME = "lastName";
+    private static final String RIGHT_SLASH = "/";
 
     public Patient getPatientById(Integer id) throws URISyntaxException {
         String baseUrl = BASE_URL + "/" + id.toString();
@@ -54,9 +55,15 @@ public class PatientService {
         return restTemplate.getForObject(uriBuilder.build().toUri(), Patient.class);
     }
 
-    public void updatePatient(Patient patient) throws JsonProcessingException {
+    public void addPatient(Patient patient) throws JsonProcessingException {
         String stringPatient = objectMapper.writeValueAsString(patient);
         HttpEntity<String> httpEntity = new HttpEntity<>(stringPatient, httpHeaders);
         restTemplate.postForObject(BASE_URL, httpEntity, String.class);
+    }
+
+    public void updatePatient(Patient patient, Integer id) throws JsonProcessingException {
+        String stringPatient = objectMapper.writeValueAsString(patient);
+        HttpEntity<String> entity = new HttpEntity<>(stringPatient, httpHeaders);
+        restTemplate.put(BASE_URL + RIGHT_SLASH + id, entity);
     }
 }

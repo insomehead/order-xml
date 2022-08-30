@@ -16,11 +16,13 @@ import java.io.PrintWriter;
 @WebFilter(servletNames = "OrderServlet", urlPatterns = "/order-servlet")
 public class SessionFilter implements Filter {
 
-    private static final Integer TIMEOUT_MINUTES = 60;
-
-    private static final String SESSION_ID_PROPERTY = "sessionId";
-
     private final SessionCache sessionCache;
+
+    private static final String SESSION_EXPIRED ="Session expired";
+    private static final String UNKNOWN_SESSION = "Unknown session";
+    private static final String INVALID_SESSION = "Invalid session";
+    private static final String SESSION_ID_PROPERTY = "sessionId";
+    private static final Integer TIMEOUT_MINUTES = 60;
 
     @Override
     public void init(FilterConfig filterConfig) {
@@ -31,23 +33,25 @@ public class SessionFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
 
+
+
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         String sessionId = httpServletRequest.getHeader(SESSION_ID_PROPERTY);
         PrintWriter out = httpServletResponse.getWriter();
         if (sessionId == null || sessionId.isEmpty()) {
             httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            out.print("Invalid session");
+            out.print(INVALID_SESSION);
             return;
         }
         Session session = sessionCache.getSessionBySessionId(sessionId);
         if (session == null) {
             httpServletResponse.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            out.print("Unknown session");
+            out.print(UNKNOWN_SESSION);
             return;
         } else if (session.getTimeoutMinutes() >= TIMEOUT_MINUTES) {
             httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.print("Session expired");
+            out.print(SESSION_EXPIRED);
             return;
         }
         filterChain.doFilter(servletRequest, servletResponse);

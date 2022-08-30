@@ -1,19 +1,14 @@
 package com.inobitec.orderxml.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.inobitec.orderxml.dto.OrderPatientDto;
 import com.inobitec.orderxml.model.Order;
 import com.inobitec.orderxml.model.Patient;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 import java.net.URISyntaxException;
-import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -23,16 +18,6 @@ public class OrderPatientService {
 
     private final PatientService patientService;
 
-    private final HttpHeaders httpHeaders = new HttpHeaders();
-    private final RestTemplate restTemplate = new RestTemplate();
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    private static final String BASE_URL = "http://localhost:8081/patient";
-
-    {
-        objectMapper.registerModule(new JavaTimeModule());
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-    }
 
     public OrderPatientDto getOrderByIdAndPatientByOrderId(Integer id) throws URISyntaxException {
         Order order = orderService.getOrderById(id);
@@ -51,68 +36,64 @@ public class OrderPatientService {
     }
 
     @Transactional
-    public ResponseEntity<OrderPatientDto> addPatientAndOrder(OrderPatientDto orderPatientDto)
+    public OrderPatientDto addPatientAndOrder(OrderPatientDto orderPatientDto)
             throws JsonProcessingException {
+        if (orderPatientDto == null || orderPatientDto.getPatient() == null | orderPatientDto.getOrder() == null) {
+            return null;
+        }
         Order order = Order.mapToEntity(orderPatientDto.getOrder());
         Patient patient = Patient.mapToEntity(orderPatientDto.getPatient());
-        String firstName = patient.getFirstName();
-        String midName = patient.getMidName();
-        String lastName = patient.getLastName();
-        LocalDate birthday = patient.getBirthday();
         Patient patientFromDatabase = patientService
-                .getPatientByBirthdayAndFullName(birthday, firstName, midName, lastName);
-        String patientFullName = firstName + " " + midName + " " + lastName;
+                .getPatientByBirthdayAndFullName(patient.getBirthday(),
+                        patient.getFirstName(), patient.getMidName(), patient.getLastName());
+        String patientFullName = patient.getFullName();
         if (patientFromDatabase == null) {
-            String stringPatient = objectMapper.writeValueAsString(patient);
-            HttpEntity<String> httpEntity = new HttpEntity<>(stringPatient, httpHeaders);
-            restTemplate.postForObject(BASE_URL, httpEntity, String.class);
+            patientService.addPatient(patient);
             Patient patientFromDatabaseAfterPost = patientService
-                    .getPatientByBirthdayAndFullName(birthday, firstName, midName, lastName);
+                    .getPatientByBirthdayAndFullName(patient.getBirthday(),
+                            patient.getFirstName(), patient.getMidName(), patient.getLastName());
             order.setPatientId(patientFromDatabaseAfterPost.getId());
             order.setCustomerName(patientFullName);
-            System.out.println(order);
             orderService.addOrder(order);
-            return new ResponseEntity<>(HttpStatus.CREATED);
+            orderPatientDto.setOrder(order.mapToDto());
+            orderPatientDto.setPatient(patient.mapToDto());
+            return orderPatientDto;
         }
-        String patientFullNameFromDatabase = patientFromDatabase.getFirstName() + " " +
-                patientFromDatabase.getMidName() + " " +
-                patientFromDatabase.getLastName();
+        String patientFullNameFromDatabase = patientFromDatabase.getFullName();
         if (patientFullName.equals(patientFullNameFromDatabase)
                 & patient.getBirthday().equals(patientFromDatabase.getBirthday())) {
             order.setPatientId(patientFromDatabase.getId());
             order.setCustomerName(patientFullNameFromDatabase);
-            System.out.println(order);
             orderService.addOrder(order);
-            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+            orderPatientDto.setOrder(order.mapToDto());
+            orderPatientDto.setPatient(patientFromDatabase.mapToDto());
+            return orderPatientDto;
         } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return null;
         }
     }
 
-    public ResponseEntity<Void> updatePatientAndOrder(Integer id, OrderPatientDto orderPatientDto)
+    public OrderPatientDto updatePatientAndOrder(Integer id, OrderPatientDto orderPatientDto)
             throws URISyntaxException, JsonProcessingException {
+        if (orderPatientDto == null || orderPatientDto.getPatient() == null | orderPatientDto.getOrder() == null) {
+            return null;
+        }
         Order order = Order.mapToEntity(orderPatientDto.getOrder());
         Patient patient = Patient.mapToEntity(orderPatientDto.getPatient());
-        String firstName = patient.getFirstName();
-        String midName = patient.getMidName();
-        String lastName = patient.getLastName();
-        String patientFullName = firstName + " " + midName + " " + lastName;
+        String patientFullName = patient.getFullName();
         order.setCustomerName(patientFullName);
         Order orderFromDatabase = orderService.getOrderById(id);
-        if (orderFromDatabase == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (orderFromDatabase == null) {
+            return null;
         }
         Integer patientId = orderFromDatabase.getPatientId();
         Patient patientFromDatabase = patientService.getPatientById(patientId);
-        if (patientFromDatabase.equals(patient)) {
-            orderService.updateOrder(id, order);
-            return new ResponseEntity<>(HttpStatus.ACCEPTED);
-        } else {
-            String stringPatient = objectMapper.writeValueAsString(patient);
-            HttpEntity<String> entity = new HttpEntity<>(stringPatient, httpHeaders);
-            restTemplate.put(BASE_URL + "/" + orderFromDatabase.getPatientId(), entity);
-            orderService.updateOrder(id, order);
-            return new ResponseEntity<>(HttpStatus.CREATED);
+        if (!patientFromDatabase.equals(patient)) {
+            patientService.updatePatient(patient, id);
         }
+        orderService.updateOrder(id, order);
+        orderPatientDto.setPatient(patient.mapToDto());
+        orderPatientDto.setOrder(order.mapToDto());
+        return orderPatientDto;
     }
 }

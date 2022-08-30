@@ -11,16 +11,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URISyntaxException;
 
+import static com.inobitec.orderxml.controller.OrderController.ORDER_PATH;
+
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/order")
+@RequestMapping(value = ORDER_PATH)
 public class OrderController {
 
     private final OrderServiceImpl orderServiceImpl;
 
     private final OrderPatientService orderPatientService;
 
+    static final String ORDER_PATH = "/order";
     private static final String ID_PARAMETER = "/{id}";
     private static final String PATIENT_PATH = "/patient";
 
@@ -37,17 +40,18 @@ public class OrderController {
     @PostMapping(PATIENT_PATH)
     public ResponseEntity<OrderPatientDto> addOrderAndPatient(@RequestBody OrderPatientDto orderPatientDto)
             throws JsonProcessingException {
-        if (orderPatientDto == null || orderPatientDto.getPatient() == null | orderPatientDto.getOrder() == null) {
+        OrderPatientDto orderPatientDtoAfterPost = orderPatientService.addPatientAndOrder(orderPatientDto);
+        if (orderPatientDtoAfterPost == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return orderPatientService.addPatientAndOrder(orderPatientDto);
+        return new ResponseEntity<>(orderPatientDtoAfterPost, HttpStatus.CREATED);
     }
 
     @PutMapping(PATIENT_PATH + ID_PARAMETER)
-    public ResponseEntity<Void> updateOrderAndPatient(@PathVariable Integer id,
+    public ResponseEntity<OrderPatientDto> updateOrderAndPatient(@PathVariable Integer id,
                                                       @RequestBody OrderPatientDto orderPatientDto)
             throws URISyntaxException, JsonProcessingException {
-        if (id == null){
+        if (id == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         System.out.println(id);
@@ -55,31 +59,15 @@ public class OrderController {
                 | orderPatientDto.getOrder() == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return orderPatientService.updatePatientAndOrder(id, orderPatientDto);
+        OrderPatientDto orderPatientDtoAfterPost = orderPatientService.updatePatientAndOrder(id, orderPatientDto);
+        if (orderPatientDtoAfterPost == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(orderPatientDtoAfterPost, HttpStatus.ACCEPTED);
     }
 
     @DeleteMapping(ID_PARAMETER)
     public void deleteOrder(@PathVariable Integer id) {
         orderServiceImpl.deleteOrderById(id);
     }
-
-    //    Запрос с практики
-//    @GetMapping(ID_PARAMETER)
-//    public Order getOrderId(@PathVariable Integer id) {
-//        return orderServiceImpl.getOrderById(id);
-//    }
-
-    //    Запрос с практики
-//    @PostMapping
-//    public Order addOrder(@RequestBody Order order) {
-//        orderServiceImpl.addOrder(order);
-//        return orderServiceImpl.getOrderById(order.getId());
-//    }
-
-    //    Запрос с практики
-//    @PutMapping(ID_PARAMETER)
-//    public Order updateOrder(@PathVariable Integer id, @RequestBody Order order) {
-//        orderServiceImpl.updateOrder(id, order);
-//        return orderServiceImpl.getOrderById(id);
-//    }
 }
