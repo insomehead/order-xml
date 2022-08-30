@@ -51,7 +51,7 @@ public class Order {
         for (OrderItem orderItem : orderItemList) {
             orderItemDtoList.add(orderItem.mapToDto(orderItem));
         }
-        orderDto.setOrderItemDtoList(orderItemDtoList);
+        orderDto.setItems(orderItemDtoList);
         return orderDto;
     }
 
@@ -64,7 +64,7 @@ public class Order {
         order.setCustomerComment(orderDto.getCustomerComment());
         order.setPatientId(orderDto.getPatientId());
 
-        List<OrderItemDto> orderItemDtoList = orderDto.getOrderItemDtoList();
+        List<OrderItemDto> orderItemDtoList = orderDto.getItems();
         if (orderItemDtoList == null || orderItemDtoList.isEmpty()){
             return order;
         }
