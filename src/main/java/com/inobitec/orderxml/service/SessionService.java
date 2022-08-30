@@ -2,7 +2,9 @@ package com.inobitec.orderxml.service;
 
 import com.inobitec.orderxml.model.Session;
 
+import java.util.List;
+
 public interface SessionService {
 
-    Session getSessionBySessionId(String sessionId);
+    List<Session> getAllSession();
 }

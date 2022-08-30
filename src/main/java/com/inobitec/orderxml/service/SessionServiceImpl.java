@@ -5,6 +5,8 @@ import com.inobitec.orderxml.model.Session;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class SessionServiceImpl implements SessionService {
@@ -12,7 +14,8 @@ public class SessionServiceImpl implements SessionService {
     private final SessionMapper sessionMapper;
 
     @Override
-    public Session getSessionBySessionId(String sessionId) {
-        return sessionMapper.findSessionBySessionId(sessionId);
+    public List<Session> getAllSession() {
+        return sessionMapper.findAllSession();
     }
+
 }

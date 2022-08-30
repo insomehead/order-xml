@@ -1,10 +1,9 @@
 package com.inobitec.orderxml.filter;
 
 
+import com.inobitec.orderxml.cache.SessionCache;
 import com.inobitec.orderxml.model.Session;
-import com.inobitec.orderxml.service.SessionServiceImpl;
 import lombok.RequiredArgsConstructor;
-//import org.springframework.beans.factory.annotation.Value;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -12,17 +11,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @WebFilter(servletNames = "OrderServlet", urlPatterns = "/order-servlet")
 public class SessionFilter implements Filter {
 
-    private final SessionServiceImpl sessionService;
-
     //    @Value("${value.timeout.minutes}") чет не вышло. потом ещё попробую
     private static final Integer TIMEOUT_MINUTES = 60;
 
     private static final String SESSION_ID_PROPERTY = "sessionId";
+
+
+    private final SessionCache sessionCache;
 
     @Override
     public void init(FilterConfig filterConfig) {
@@ -36,6 +37,7 @@ public class SessionFilter implements Filter {
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         String sessionId = httpServletRequest.getHeader(SESSION_ID_PROPERTY);
+        Map<String, Session> sessionMap = sessionCache.addCache();
         Session session;
         PrintWriter out = httpServletResponse.getWriter();
 
@@ -44,7 +46,7 @@ public class SessionFilter implements Filter {
             out.print("Invalid session");
             return;
         } else {
-            session = sessionService.getSessionBySessionId(sessionId);
+            session = sessionMap.get(sessionId);
         }
         if (session == null) {
             httpServletResponse.setStatus(HttpServletResponse.SC_NOT_FOUND);

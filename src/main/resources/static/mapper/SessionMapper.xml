@@ -17,7 +17,12 @@
                START_TIME,
                TIMEOUT_MINUTES
         FROM session
-        WHERE SESSION_ID=#{sessionId}
+        WHERE SESSION_ID = #{sessionId}
+    </select>
+
+    <select id="findAllSession" resultMap="sessionMap">
+        SELECT session.ID, session.SESSION_ID, session.START_TIME, session.TIMEOUT_MINUTES
+        FROM session
     </select>
 
 </mapper>

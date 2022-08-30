@@ -2,10 +2,11 @@ package com.inobitec.orderxml.mapper;
 
 import com.inobitec.orderxml.model.Session;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 @Mapper
 public interface SessionMapper {
 
-    Session findSessionBySessionId(@Param("sessionId") String sessionId);
+    List<Session> findAllSession();
 }
