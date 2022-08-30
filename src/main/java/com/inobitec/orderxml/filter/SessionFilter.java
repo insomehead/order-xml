@@ -37,7 +37,8 @@ public class SessionFilter implements Filter {
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         String sessionId = httpServletRequest.getHeader(SESSION_ID_PROPERTY);
-        Map<String, Session> sessionMap = sessionCache.addCache();
+        sessionCache.addCache();
+        Map<String, Session> sessionMap = sessionCache.getMap();
         Session session;
         PrintWriter out = httpServletResponse.getWriter();
 
