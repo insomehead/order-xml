@@ -1,7 +1,13 @@
 package com.inobitec.orderxml.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.inobitec.orderxml.model.Patient;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -12,9 +18,17 @@ import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
-public class PatientControllerService {
+public class PatientService {
 
     private final RestTemplate restTemplate = new RestTemplate();
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final HttpHeaders httpHeaders = new HttpHeaders();
+
+
+    {
+        objectMapper.registerModule(new JavaTimeModule());
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+    }
 
     private static final String BASE_URL = "http://localhost:8081/patient";
     private static final String BIRTHDAY = "birthday";
@@ -38,5 +52,11 @@ public class PatientControllerService {
                 .queryParam(MID_NAME, midName)
                 .queryParam(LAST_NAME, lastName);
         return restTemplate.getForObject(uriBuilder.build().toUri(), Patient.class);
+    }
+
+    public void updatePatient(Patient patient) throws JsonProcessingException {
+        String stringPatient = objectMapper.writeValueAsString(patient);
+        HttpEntity<String> httpEntity = new HttpEntity<>(stringPatient, httpHeaders);
+        restTemplate.postForObject(BASE_URL, httpEntity, String.class);
     }
 }

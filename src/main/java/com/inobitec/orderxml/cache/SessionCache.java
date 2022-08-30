@@ -13,25 +13,25 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-@RequiredArgsConstructor
 @EnableAsync
+@RequiredArgsConstructor
 public class SessionCache{
-
 
     private final SessionService sessionService;
 
-    Map<String, Session> map = new ConcurrentHashMap<>();
+    private final Map<String, Session> map = new ConcurrentHashMap<>();
 
     @Async
-    @Scheduled(fixedDelay =  60000)
+    @Scheduled(fixedRate =  60000)
     public void addCache() {
+        map.clear();
         List<Session> sessionList = sessionService.getAllSession();
         for (Session session : sessionList) {
             map.put(session.getSessionId(), session);
         }
     }
 
-    public Map<String, Session> getMap() {
-        return map;
+    public Session getSessionBySessionId(String sessionId) {
+        return map.get(sessionId);
     }
 }

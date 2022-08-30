@@ -21,7 +21,7 @@ public class OrderPatientService {
 
     private final OrderService orderService;
 
-    private final PatientControllerService patientControllerService;
+    private final PatientService patientService;
 
     private final HttpHeaders httpHeaders = new HttpHeaders();
     private final RestTemplate restTemplate = new RestTemplate();
@@ -40,35 +40,33 @@ public class OrderPatientService {
             return null;
         }
         Integer orderPatientId = order.getPatientId();
-        Patient patient = patientControllerService.getPatientById(orderPatientId);
+        Patient patient = patientService.getPatientById(orderPatientId);
         if (patient == null) {
             return null;
         }
         OrderPatientDto orderPatientDto = new OrderPatientDto();
-        orderPatientDto.setOrder(order);
-        orderPatientDto.setPatient(patient);
+        orderPatientDto.setOrder(order.mapToDto());
+        orderPatientDto.setPatient(patient.mapToDto());
         return orderPatientDto;
     }
 
     @Transactional
     public ResponseEntity<OrderPatientDto> addPatientAndOrder(OrderPatientDto orderPatientDto)
             throws JsonProcessingException {
-        Order order = orderPatientDto.getOrder();
-        Patient patient = orderPatientDto.getPatient();
+        Order order = Order.mapToEntity(orderPatientDto.getOrder());
+        Patient patient = Patient.mapToEntity(orderPatientDto.getPatient());
         String firstName = patient.getFirstName();
         String midName = patient.getMidName();
         String lastName = patient.getLastName();
-//        objectMapper.registerModule(new JavaTimeModule())
         LocalDate birthday = patient.getBirthday();
-        Patient patientFromDatabase = patientControllerService
+        Patient patientFromDatabase = patientService
                 .getPatientByBirthdayAndFullName(birthday, firstName, midName, lastName);
         String patientFullName = firstName + " " + midName + " " + lastName;
         if (patientFromDatabase == null) {
-//            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
             String stringPatient = objectMapper.writeValueAsString(patient);
             HttpEntity<String> httpEntity = new HttpEntity<>(stringPatient, httpHeaders);
             restTemplate.postForObject(BASE_URL, httpEntity, String.class);
-            Patient patientFromDatabaseAfterPost = patientControllerService
+            Patient patientFromDatabaseAfterPost = patientService
                     .getPatientByBirthdayAndFullName(birthday, firstName, midName, lastName);
             order.setPatientId(patientFromDatabaseAfterPost.getId());
             order.setCustomerName(patientFullName);
@@ -93,8 +91,8 @@ public class OrderPatientService {
 
     public ResponseEntity<Void> updatePatientAndOrder(Integer id, OrderPatientDto orderPatientDto)
             throws URISyntaxException, JsonProcessingException {
-        Order order = orderPatientDto.getOrder();
-        Patient patient = orderPatientDto.getPatient();
+        Order order = Order.mapToEntity(orderPatientDto.getOrder());
+        Patient patient = Patient.mapToEntity(orderPatientDto.getPatient());
         String firstName = patient.getFirstName();
         String midName = patient.getMidName();
         String lastName = patient.getLastName();
@@ -105,7 +103,7 @@ public class OrderPatientService {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         Integer patientId = orderFromDatabase.getPatientId();
-        Patient patientFromDatabase = patientControllerService.getPatientById(patientId);
+        Patient patientFromDatabase = patientService.getPatientById(patientId);
         if (patientFromDatabase.equals(patient)) {
             orderService.updateOrder(id, order);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);

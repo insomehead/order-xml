@@ -1,13 +1,16 @@
 package com.inobitec.orderxml.dto;
 
-import com.inobitec.orderxml.model.Order;
-import com.inobitec.orderxml.model.Patient;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Data;
 
 @Data
+@JacksonXmlRootElement(localName = "orderItemDto")
 public class OrderPatientDto {
 
-    private Order order;
+    @JacksonXmlProperty(localName = "order")
+    private OrderDto order;
 
-    private Patient patient;
+    @JacksonXmlProperty(localName = "patient")
+    private PatientDto patient;
 }
