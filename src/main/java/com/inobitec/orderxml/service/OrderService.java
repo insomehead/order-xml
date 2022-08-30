@@ -8,7 +8,7 @@ public interface OrderService {
 
     void deleteOrderById(Integer id);
 
-    void saveOrder(Order order);
+    void addOrder(Order order);
 
     void updateOrder(Integer id, Order order);
 }

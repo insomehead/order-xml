@@ -16,7 +16,7 @@
         WHERE ORDER_ID = #{id};
     </delete>
 
-    <insert id="saveOrderItem" keyColumn="id" keyProperty="id" parameterType="com.inobitec.orderxml.model.OrderItem">
+    <insert id="addOrderItem" keyColumn="id" keyProperty="id" parameterType="com.inobitec.orderxml.model.OrderItem">
         <selectKey keyProperty="orderItem.id" resultType="int" order="BEFORE">
             SELECT NEXTVAL('ORDER_ITEM_SEQ')
         </selectKey>

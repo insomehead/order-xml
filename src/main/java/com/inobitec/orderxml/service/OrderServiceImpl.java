@@ -29,60 +29,31 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void saveOrder(Order order) {
-        orderMapper.saveOrder(order);
+    public void addOrder(Order order) {
+        orderMapper.addOrder(order);
+        List<OrderItem> orderItemList = order.getOrderItemList();
         if (order.getOrderItemList() == null || order.getOrderItemList().isEmpty()) {
             return;
         }
-        for (int i = 0; i < order.getOrderItemList().size(); i++) {
-            order.getOrderItemList().get(i).setOrderId(order.getId());
-            orderItemMapper.saveOrderItem(order.getOrderItemList().get(i));
+        for (OrderItem orderItem : orderItemList) {
+            Integer orderId = order.getId();
+            orderItem.setOrderId(orderId);
+            orderItemMapper.addOrderItem(orderItem);
         }
     }
 
     @Override
     public void updateOrder(Integer id, Order order) {
-        List<OrderItem> oldOrderItemList = orderMapper.findOrderById(id).getOrderItemList();
         List<OrderItem> orderItemList = order.getOrderItemList();
-
         orderMapper.updateOrder(order, id);
         if (orderItemList == null || orderItemList.isEmpty()) {
             orderItemMapper.deleteOrderItemByOrderId(id);
             return;
         }
-        if (oldOrderItemList.size() == orderItemList.size()) {
-            for (int i = 0; i < orderItemList.size(); i++) {
-                orderItemMapper.updateOrderItem(
-                        oldOrderItemList.get(i).getId(),
-                        id,
-                        orderItemList.get(i).getItemName()
-                );
-            }
-        }
-        if (orderItemList.size() < oldOrderItemList.size()) {
-            for (int i = 0; i < orderItemList.size(); i++) {
-                orderItemMapper.updateOrderItem(
-                        oldOrderItemList.get(i).getId(),
-                        id,
-                        orderItemList.get(i).getItemName()
-                );
-            }
-            for (int i = orderItemList.size(); i < oldOrderItemList.size(); i++) {
-                orderItemMapper.deleteOrderItemById(oldOrderItemList.get(i).getId());
-            }
-        }
-        if (orderItemList.size() > oldOrderItemList.size()) {
-            for (int i = 0; i < oldOrderItemList.size(); i++) {
-                orderItemMapper.updateOrderItem(
-                        oldOrderItemList.get(i).getId(),
-                        id,
-                        orderItemList.get(i).getItemName()
-                );
-            }
-            for (int i = oldOrderItemList.size(); i < orderItemList.size(); i++) {
-                order.getOrderItemList().get(i).setOrderId(id);
-                orderItemMapper.saveOrderItem(orderItemList.get(i));
-            }
+        orderItemMapper.deleteOrderItemByOrderId(id);
+        for (OrderItem orderItem : orderItemList) {
+            orderItem.setOrderId(id);
+            orderItemMapper.addOrderItem(orderItem);
         }
     }
 }
